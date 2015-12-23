@@ -7,15 +7,24 @@
 //
 
 import UIKit
+import WatchKit
+import WatchConnectivity
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, WCSessionDelegate {
 
     var window: UIWindow?
+    var session: WCSession!
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        if WCSession.isSupported() {
+            session = WCSession.defaultSession()
+            session.delegate = self
+            session.activateSession()
+        }
+        
         return true
     }
 
@@ -39,6 +48,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+    
+    func session(session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
+        
+        replyHandler(["data": ["hello", "something else"]])
+        
     }
 
 

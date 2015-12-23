@@ -8,14 +8,22 @@
 
 import WatchKit
 import Foundation
+import WatchConnectivity
 
+class InterfaceController: WKInterfaceController, WCSessionDelegate {
+    var session: WCSession!
 
-class InterfaceController: WKInterfaceController {
-
+    @IBOutlet var textLabel: WKInterfaceLabel!
+    
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
         
-        // Configure interface objects here.
+        if WCSession.isSupported() {
+            session = WCSession.defaultSession()
+            session.delegate = self
+            session.activateSession()
+        }
+        
     }
 
     override func willActivate() {
@@ -27,5 +35,26 @@ class InterfaceController: WKInterfaceController {
         // This method is called when watch view controller is no longer visible
         super.didDeactivate()
     }
+    
+    func getData() {
+        if session.reachable {
+            session.sendMessage(["data": "update"], replyHandler: { (data: [String : AnyObject]) -> Void in
+                
+                let res = data["data"]
+            
+                let text = res![0] as! String?
+                
+                self.textLabel.setText(text)
+                
+                }, errorHandler: { (error) -> Void in
+                    
+            })
+        }
+    }
+    
+    @IBAction func updateText() {
+        getData()
+    }
+    
 
 }
